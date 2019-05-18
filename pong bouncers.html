@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Bouncers Pongs</title>
+<style type="text/css">
+  canvas {
+     border : 2px solid;
+     margin : 0 auto;
+     display : block;
+     margin-top : 10px;
+    
+  }
+  
+footer{
+    display:block;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(3, 5, 15, 0.514);
+            color: white;
+            padding: 5px;
+            text-align: center;
+        }
+</style>
+</head>
+<body>
+    <!-- Footer -->
+<footer>
+        <div class="footer-copyright text-center py-3">© Developped By MAQDAD Ayoub GLSID2 </div>
+    </footer>
+  <canvas id="gameCanvas" height="500px" width="1200px"/>
+  
+	<script type="text/javascript">
+	
+  	var canvas = document.getElementById("gameCanvas");
+  	var ctx = canvas.getContext("2d");
+
+  	var ballR = 15, x = canvas.width / 2, y = canvas.height - 30, dx = 3, dy = -3, 
+		pongH = 15, pongW = 150, pongX = (canvas.width - pongW) / 2,
+		rightKey = false, leftKey = false,
+		score = 0, life = 5,
+
+		Balls = new Array(6)
+
+		function ball(){
+			Balls = Balls.fill(0).map( _ => ({
+                x : Math.random() * (canvas.width -2 * ballR) + ballR,
+                y : ballR + 1 ,
+								dx : Math.random() *2 - 1,
+								dy : - (Math.random() + 0.1) ,
+            }))
+
+		}		
+
+		ball()
+
+
+  	 function dessinerBall() {
+			 Balls.forEach(c => {
+			 ctx.beginPath();
+  	   ctx.arc(c.x, c.y, ballR, 0, Math.PI * 2);
+  	   ctx.fillStyle = "#6c757d";
+  	   ctx.fill();
+  	   ctx.closePath();
+			 });
+  	   
+  	 }
+
+		 function dessinerText(){
+						ctx.font = "20px Arial";
+            ctx.fillText("Score : "+score+"    Life : "+life, 50, 50);
+		 }
+  	
+  	 function dessinerPong() {
+			 if(rightKey) pongX += 10
+       if(leftKey) pongX -= 10
+  	   ctx.beginPath();
+  	   ctx.rect(pongX, canvas.height - pongH, pongW, pongH);
+  	   ctx.fillStyle = "#343a40";
+  	   ctx.fill();
+  	   ctx.closePath();
+  	 }  	 
+
+  	 function dessiner() {
+  	   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  	   dessinerBall();
+  	   dessinerPong();
+			 dessinerText()
+  	   
+			 Balls.forEach(c => {
+	if (hitTop())
+				c.dy = -c.dy-0.01;
+				
+				if (hitSideWall())
+  	     c.dx = -c.dx-0.01;
+  	     
+  	   if ( hitPong()){
+				c.dy = -c.dy-0.01;
+				score ++;
+			 }
+  	    
+			
+  	  
+			 	if(hitBottom()){
+					 life --;
+					 c.x= Math.random() * (canvas.width -2 * ballR) + ballR;
+					 c.y = ballR + 1;
+				 }
+				 
+
+  	   if (gameOver()){
+				ctx.font = "50px Arial";
+			  ctx.fillText("Game Over", (canvas.width /2) - 75 , (canvas.height /2 ) );
+			  return;
+  	   }
+
+  	   function hitPong() { return hitBottom() && ballOverPong(); }
+  	   
+  	   function xOutOfBounds() { return c.x + c.dx > canvas.width - ballR ||  c.c.x + c.dx < ballR; }
+  	   function rightPressed(e) { return e.key == 'ArrowRight'; }
+  	   function leftPressed(e) { return e.key == 'ArrowLeft'; }
+function ballOverPong() { return c.x > pongX  &&  c.x < pongX + pongW; }
+  	   function hitBottom() { return c.y + c.dy > canvas.height - ballR; }
+  	   function gameOver() { return life == 0; }
+  	   function hitSideWall() { return c.x + c.dx > canvas.width - ballR || c.x + c.dx < ballR; }
+  	   function hitTop() { return c.y + c.dy < ballR; }
+  	   function keyDown(e) {
+  	     rightKey = rightPressed(e);
+  	     leftKey = leftPressed(e);
+  	   }
+  	   
+  	   function keyUp(e) {
+  	     rightKey = rightPressed(e) ? false : rightKey;
+  	     leftKey = leftPressed(e) ? false : leftKey;
+  	   }
+  	   
+  	   document.addEventListener("keydown", keyDown, false);
+  	   document.addEventListener("keyup", keyUp, false);
+  	   
+  	   var maxX = canvas.width - pongW, minX = 0, pongDelta = rightKey ? 0.5 : leftKey ? -0.5 : 0;
+  	   
+  	   pongX = pongX + pongDelta;
+  	   pongX = Math.min(pongX, maxX);
+  	   pongX = Math.max(pongX, minX);
+  	   
+  	   c.x += c.dx;
+  	   c.y += c.dy;
+			 });
+
+  	 }
+  	 
+  	 setInterval(dessiner, 10);
+  	  
+  </script>
+  
+</body>
+</html>
